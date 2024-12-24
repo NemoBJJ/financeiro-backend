@@ -13,6 +13,7 @@ public class FinancialStatistics {
     private double desvioPadraoReceitas;
     private double desvioPadraoDespesas;
 
+    // Construtor
     public FinancialStatistics(double totalReceitas, double totalDespesas, double mediaReceitasMensal,
                                 double mediaDespesasMensal, double medianaReceitas, double medianaDespesas,
                                 double modaReceitas, double modaDespesas, double desvioPadraoReceitas,

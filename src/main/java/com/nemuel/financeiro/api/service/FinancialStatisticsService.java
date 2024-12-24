@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +39,22 @@ public class FinancialStatisticsService {
 
     public Page<Transaction> getTransactionsPaged(Pageable pageable) {
         return transactionRepository.findAll(pageable);
+    }
+
+    public Optional<Transaction> getTransactionById(Long id) {
+        return transactionRepository.findById(id);
+    }
+
+    // Atualiza uma transação pelo ID
+    public Optional<Transaction> updateTransaction(Long id, Transaction updatedTransaction) {
+        return transactionRepository.findById(id).map(existingTransaction -> {
+            existingTransaction.setDescription(updatedTransaction.getDescription());
+            existingTransaction.setAmount(updatedTransaction.getAmount());
+            existingTransaction.setDate(updatedTransaction.getDate());
+            existingTransaction.setType(updatedTransaction.getType());
+            existingTransaction.setTransactionCategory(updatedTransaction.getTransactionCategory());
+            return transactionRepository.save(existingTransaction);
+        });
     }
 
     // Método de Cálculo de Estatísticas
