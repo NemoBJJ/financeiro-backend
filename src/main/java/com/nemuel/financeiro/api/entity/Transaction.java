@@ -9,25 +9,23 @@ import jakarta.persistence.Column;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "transactions") // Define o nome correto da tabela
+@Table(name = "transactions")
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String description;
-
     private Double amount;
-
     private LocalDate date;
-
     private String type;
 
-    @Column(name = "transaction_category") // Nome da coluna no banco
-    private String transaction_category;
+    @Column(name = "transaction_category")
+    private String transactionCategory;
 
-    @Column(name = "transaction_month") // Nome da coluna no banco
-    private String transaction_month;
+    @Column(name = "transaction_month")
+    private String transactionMonth;
 
     // Getters e Setters
     public Long getId() {
@@ -70,19 +68,19 @@ public class Transaction {
         this.type = type;
     }
 
-    public String getTransaction_category() {
-        return transaction_category;
+    public String getTransactionCategory() {
+        return transactionCategory;
     }
 
-    public void setTransaction_category(String transaction_category) {
-        this.transaction_category = transaction_category;
+    public void setTransactionCategory(String transactionCategory) {
+        this.transactionCategory = transactionCategory;
     }
 
-    public String getTransaction_month() {
-        return transaction_month;
+    public String getTransactionMonth() {
+        return transactionMonth;
     }
 
-    public void setTransaction_month(String transaction_month) {
-        this.transaction_month = transaction_month;
+    public void setTransactionMonth(String transactionMonth) {
+        this.transactionMonth = transactionMonth;
     }
 }

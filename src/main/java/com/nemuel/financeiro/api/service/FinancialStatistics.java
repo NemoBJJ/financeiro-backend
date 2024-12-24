@@ -1,8 +1,7 @@
 package com.nemuel.financeiro.api.service;
 
-import java.util.Objects;
-
 public class FinancialStatistics {
+
     private double totalReceitas;
     private double totalDespesas;
     private double mediaReceitasMensal;
@@ -14,7 +13,6 @@ public class FinancialStatistics {
     private double desvioPadraoReceitas;
     private double desvioPadraoDespesas;
 
-    // Construtor que inicializa todos os campos
     public FinancialStatistics(double totalReceitas, double totalDespesas, double mediaReceitasMensal,
                                 double mediaDespesasMensal, double medianaReceitas, double medianaDespesas,
                                 double modaReceitas, double modaDespesas, double desvioPadraoReceitas,
@@ -31,7 +29,7 @@ public class FinancialStatistics {
         this.desvioPadraoDespesas = desvioPadraoDespesas;
     }
 
-    // Getters e Setters (opcionalmente automáticos para todos os campos)
+    // Getters e Setters
     public double getTotalReceitas() {
         return totalReceitas;
     }

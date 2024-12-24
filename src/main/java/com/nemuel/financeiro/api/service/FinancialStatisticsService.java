@@ -2,9 +2,12 @@ package com.nemuel.financeiro.api.service;
 
 import com.nemuel.financeiro.api.entity.Transaction;
 import com.nemuel.financeiro.api.repository.TransactionRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,76 +19,85 @@ public class FinancialStatisticsService {
         this.transactionRepository = transactionRepository;
     }
 
+    // Operações CRUD Básicas
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
+
+    public Transaction addTransaction(Transaction transaction) {
+        return transactionRepository.save(transaction);
+    }
+
+    public String deleteTransaction(Long id) {
+        if (transactionRepository.existsById(id)) {
+            transactionRepository.deleteById(id);
+            return "Transaction removed successfully!";
+        }
+        return "Transaction not found!";
+    }
+
+    public Page<Transaction> getTransactionsPaged(Pageable pageable) {
+        return transactionRepository.findAll(pageable);
+    }
+
+    // Método de Cálculo de Estatísticas
     public FinancialStatistics calculateStatistics() {
-        // Obtenha todas as transações
         List<Transaction> transactions = transactionRepository.findAll();
 
-        // Filtrar receitas e despesas
         List<Double> receitas = transactions.stream()
-                .filter(t -> "RECEITA".equals(t.getType()))
+                .filter(t -> "RECEITA".equalsIgnoreCase(t.getType()))
                 .map(Transaction::getAmount)
-                .collect(Collectors.toList());
+                .toList();
 
         List<Double> despesas = transactions.stream()
-                .filter(t -> "DESPESA".equals(t.getType()))
+                .filter(t -> "DESPESA".equalsIgnoreCase(t.getType()))
                 .map(Transaction::getAmount)
-                .collect(Collectors.toList());
+                .toList();
 
-        // Cálculos básicos
         double totalReceitas = roundToTwoDecimalPlaces(receitas.stream().mapToDouble(Double::doubleValue).sum());
         double totalDespesas = roundToTwoDecimalPlaces(despesas.stream().mapToDouble(Double::doubleValue).sum());
-
         double mediaReceitasMensal = roundToTwoDecimalPlaces(totalReceitas / 12);
         double mediaDespesasMensal = roundToTwoDecimalPlaces(totalDespesas / 12);
-
-        // Cálculos avançados
         double medianaReceitas = roundToTwoDecimalPlaces(calculateMediana(receitas));
         double medianaDespesas = roundToTwoDecimalPlaces(calculateMediana(despesas));
-
         double modaReceitas = roundToTwoDecimalPlaces(calculateModa(receitas));
         double modaDespesas = roundToTwoDecimalPlaces(calculateModa(despesas));
-
         double desvioPadraoReceitas = roundToTwoDecimalPlaces(calculateDesvioPadrao(receitas));
         double desvioPadraoDespesas = roundToTwoDecimalPlaces(calculateDesvioPadrao(despesas));
 
-        // Criar e retornar o objeto FinancialStatistics
         return new FinancialStatistics(totalReceitas, totalDespesas, mediaReceitasMensal, mediaDespesasMensal,
-                medianaReceitas, medianaDespesas, modaReceitas, modaDespesas,
-                desvioPadraoReceitas, desvioPadraoDespesas);
+                medianaReceitas, medianaDespesas, modaReceitas, modaDespesas, desvioPadraoReceitas, desvioPadraoDespesas);
     }
 
+    // Métodos Auxiliares para Cálculos
     private double calculateMediana(List<Double> valores) {
         if (valores.isEmpty()) return 0;
-        Collections.sort(valores);
-        int tamanho = valores.size();
-        if (tamanho % 2 == 0) {
-            return (valores.get(tamanho / 2 - 1) + valores.get(tamanho / 2)) / 2.0;
+        List<Double> sorted = valores.stream().sorted().toList();
+        int middle = sorted.size() / 2;
+        if (sorted.size() % 2 == 0) {
+            return (sorted.get(middle - 1) + sorted.get(middle)) / 2.0;
         } else {
-            return valores.get(tamanho / 2);
+            return sorted.get(middle);
         }
     }
 
     private double calculateModa(List<Double> valores) {
         if (valores.isEmpty()) return 0;
-        Map<Double, Long> frequencias = valores.stream()
-                .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
-        return frequencias.entrySet().stream()
+        return valores.stream()
+                .collect(Collectors.groupingBy(v -> v, Collectors.counting()))
+                .entrySet()
+                .stream()
                 .max(Map.Entry.comparingByValue())
-                .get()
+                .orElseThrow()
                 .getKey();
     }
 
     private double calculateDesvioPadrao(List<Double> valores) {
         if (valores.isEmpty()) return 0;
-        double media = valores.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-        double variancia = valores.stream()
-                .mapToDouble(v -> Math.pow(v - media, 2))
-                .average()
-                .orElse(0.0);
-        return Math.sqrt(variancia);
+        double media = valores.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+        return Math.sqrt(valores.stream().mapToDouble(v -> Math.pow(v - media, 2)).average().orElse(0));
     }
 
-    // Método auxiliar para arredondar para 2 casas decimais
     private double roundToTwoDecimalPlaces(double value) {
         return Math.round(value * 100.0) / 100.0;
     }

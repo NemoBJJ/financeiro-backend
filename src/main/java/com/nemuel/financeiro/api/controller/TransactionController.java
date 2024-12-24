@@ -1,7 +1,9 @@
 package com.nemuel.financeiro.api.controller;
 
 import com.nemuel.financeiro.api.entity.Transaction;
-import com.nemuel.financeiro.api.repository.TransactionRepository;
+import com.nemuel.financeiro.api.service.FinancialStatisticsService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,32 +13,33 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class TransactionController {
 
-    private final TransactionRepository transactionRepository;
+    private final FinancialStatisticsService financialStatisticsService;
 
-    // Construtor para injeção de dependência
-    public TransactionController(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
+    public TransactionController(FinancialStatisticsService financialStatisticsService) {
+        this.financialStatisticsService = financialStatisticsService;
     }
 
     // Retorna todas as transações do banco de dados
     @GetMapping
     public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+        return financialStatisticsService.getAllTransactions();
     }
 
     // Adiciona uma nova transação ao banco de dados
     @PostMapping
     public Transaction addTransaction(@RequestBody Transaction transaction) {
-        return transactionRepository.save(transaction);
+        return financialStatisticsService.addTransaction(transaction);
     }
 
     // Remove uma transação com base no ID fornecido
     @DeleteMapping("/{id}")
     public String deleteTransaction(@PathVariable Long id) {
-        if (transactionRepository.existsById(id)) {
-            transactionRepository.deleteById(id);
-            return "Transaction removed successfully!";
-        }
-        return "Transaction not found!";
+        return financialStatisticsService.deleteTransaction(id);
+    }
+
+    // Retorna transações paginadas com todos os campos do banco
+    @GetMapping("/paged")
+    public Page<Transaction> getTransactionsPaged(Pageable pageable) {
+        return financialStatisticsService.getTransactionsPaged(pageable);
     }
 }
