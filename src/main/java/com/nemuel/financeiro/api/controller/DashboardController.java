@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/api")
 public class DashboardController {
 
-    @CrossOrigin(origins = "http://localhost:3000") // Permite apenas o frontend acessar
+    @CrossOrigin(origins = "http://localhost:3002") // Permite apenas o frontend acessar
     @GetMapping("/dashboard")
     public Map<String, Object> getDashboardData() {
         Map<String, Object> data = new HashMap<>();
